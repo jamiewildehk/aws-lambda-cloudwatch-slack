@@ -22,12 +22,12 @@ var ALARM_CONFIG = [
 ];
 
 var SLACK_CONFIG = {
-	token: "YOUR_TOKEN",
-	team: "YOUR_TEAM"
+	url: "YOUR_WEBHOOK_URL"
 };
 
 var http = require ('https');
 var querystring = require ('querystring');
+var url = require ('url');
 exports.handler = function(event, context) {
 	console.log(event.Records[0]);
 
@@ -90,10 +90,13 @@ exports.handler = function(event, context) {
 	  "payload": payloadStr
 	});
 	console.log(postData);
+
+	var slackUrl = url.parse(SLACK_CONFIG.url);
+
 	var options = {
-		hostname: SLACK_CONFIG.team + ".slack.com",
+		hostname: slackUrl.hostname,
 		port: 443,
-		path: '/services/hooks/incoming-webhook?token='+SLACK_CONFIG.token,
+		path: slackUrl.path,
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
@@ -113,4 +116,3 @@ exports.handler = function(event, context) {
 	req.write(postData);
 	req.end();
 };
-
